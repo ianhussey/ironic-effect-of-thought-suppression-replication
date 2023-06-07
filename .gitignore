@@ -1,3 +1,5 @@
 
 *.DS_Store
 blind materials/psychopy installers/
+blind materials/PsychoPy Experiment (2021.2.3)/data/*
+*.Rhistory
