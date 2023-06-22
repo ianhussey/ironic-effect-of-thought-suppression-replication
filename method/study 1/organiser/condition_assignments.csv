@@ -1,81 +1,81 @@
 Instruction,Condition,Word,Target,Order,condition_printed,word_printed
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,1,try,MOUNTAIN
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,1,try,CHILD
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,1,try NOT,CHILD
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,2,try,HOUSE
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,2,try NOT,CAR
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,2,try,HOUSE
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,1,try,MOUNTAIN
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,2,try NOT,CHILD
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,1,try,HOUSE
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,1,try NOT,HOUSE
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,2,try NOT,CAR
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,2,try NOT,CHILD
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,1,try NOT,MOUNTAIN
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,1,try,MOUNTAIN
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,1,try NOT,CHILD
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,2,try NOT,HOUSE
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,2,try,HOUSE
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,1,try NOT,HOUSE
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,1,try,MOUNTAIN
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,1,try NOT,MOUNTAIN
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,2,try,CHILD
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,2,try NOT,HOUSE
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,2,try NOT,CHILD
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,2,try NOT,HOUSE
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,2,try,CHILD
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,1,try NOT,HOUSE
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,2,try,MOUNTAIN
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,1,try,HOUSE
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,2,try NOT,CHILD
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,1,try,MOUNTAIN
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,1,try NOT,CAR
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,2,try NOT,CHILD
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,2,try NOT,MOUNTAIN
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,1,try,HOUSE
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,2,try NOT,MOUNTAIN
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,1,try,HOUSE
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,2,try,HOUSE
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,2,try,CAR
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,1,try,CHILD
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,2,try,MOUNTAIN
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,1,try,CAR
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,1,try NOT,HOUSE
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,1,try,CAR
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,1,try NOT,CHILD
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,1,try,CHILD
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,2,try NOT,MOUNTAIN
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,1,try NOT,HOUSE
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,2,try NOT,MOUNTAIN
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,2,try,CAR
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,2,try,CAR
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,2,try,CHILD
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,1,try NOT,CHILD
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,1,try,CAR
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,2,try,CHILD
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,1,try,CAR
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,2,try NOT,MOUNTAIN
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,2,try,MOUNTAIN
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,2,try,CAR
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,1,try NOT,MOUNTAIN
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,1,try NOT,CAR
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,1,try NOT,MOUNTAIN
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,1,try,CHILD
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,1,try NOT,CAR
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,2,try,HOUSE
-"For your first task, please try NOT to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",1,1,1,1,try NOT,MOUNTAIN
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,2,try,MOUNTAIN
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,2,try NOT,CAR
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,1,try NOT,CAR
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,2,try NOT,CAR
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,1,try NOT,CAR
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,1,try,CHILD
-"For your first task, please try to think about a CHILD for the next five minutes. I will be back in five minutes",2,3,2,2,try,CHILD
-"For your first task, please try to think about a MOUNTAIN for the next five minutes. I will be back in five minutes",2,1,1,2,try,MOUNTAIN
-"For your first task, please try to think about a HOUSE for the next five minutes. I will be back in five minutes",2,4,2,1,try,HOUSE
-"For your first task, please try NOT to think about a CAR for the next five minutes. I will be back in five minutes",1,2,1,2,try NOT,CAR
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,2,try NOT,HOUSE
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,1,try,CAR
-"For your first task, please try NOT to think about a HOUSE for the next five minutes. I will be back in five minutes",1,4,2,2,try NOT,HOUSE
-"For your first task, please try NOT to think about a CHILD for the next five minutes. I will be back in five minutes",1,3,2,1,try NOT,CHILD
-"For your first task, please try to think about a CAR for the next five minutes. I will be back in five minutes",2,2,1,2,try,CAR
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,1,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,1,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,1,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,2,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,2,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,2,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,1,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,2,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,1,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,1,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,2,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,2,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,1,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,1,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,1,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,2,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,2,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,1,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,1,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,1,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,2,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,2,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,2,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,2,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,2,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,1,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,2,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,1,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,2,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,1,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,1,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,2,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,2,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,1,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,2,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,1,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,2,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,2,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,1,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,2,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,1,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,1,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,1,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,1,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,1,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,2,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,1,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,2,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,2,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,2,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,2,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,1,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,1,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,2,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,1,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,2,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,2,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,2,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,1,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,1,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,1,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,1,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,1,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,2,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an einen BERG zu denken. Ich bin in fünf Minuten zurück.",1,1,1,1,NICHT an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,2,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,2,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,1,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,2,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,1,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,1,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein KIND zu denken. Ich bin in fünf Minuten zurück.",2,3,2,2,an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an einen BERG zu denken. Ich bin in fünf Minuten zurück.",2,1,1,2,an,einen BERG
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",2,4,2,1,an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",1,2,1,2,NICHT an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,2,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,1,an,ein AUTO
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein HAUS zu denken. Ich bin in fünf Minuten zurück.",1,4,2,2,NICHT an,ein HAUS
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten NICHT an ein KIND zu denken. Ich bin in fünf Minuten zurück.",1,3,2,1,NICHT an,ein KIND
+"Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten an ein AUTO zu denken. Ich bin in fünf Minuten zurück.",2,2,1,2,an,ein AUTO

@@ -11,7 +11,7 @@
 
 <meta name="author" content="Ian Hussey" />
 
-<meta name="date" content="2023-06-07" />
+<meta name="date" content="2023-06-22" />
 
 <title>Study 1 condition assignment</title>
 
@@ -1893,7 +1893,7 @@ border-radius: 0px;
 
 <h1 class="title toc-ignore">Study 1 condition assignment</h1>
 <h4 class="author">Ian Hussey</h4>
-<h4 class="date">07 June 2023</h4>
+<h4 class="date">22 June 2023</h4>
 
 </div>
 
@@ -1917,23 +1917,39 @@ border-radius: 0px;
 <span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>              <span class="at">Order =</span> <span class="fu">rep</span>(<span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>), <span class="at">times =</span> <span class="dv">40</span>))</span>
 <span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
 <span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># create dependent columns</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>dat_annotated <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Target =</span> <span class="fu">case_when</span>(Word <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">~</span> <span class="dv">1</span>,</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>                            Word <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>) <span class="sc">~</span> <span class="dv">2</span>),</span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>         <span class="at">condition_printed =</span> <span class="fu">case_when</span>(Condition <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;try NOT&quot;</span>,</span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>                                       Condition <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;try&quot;</span>),</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>         <span class="at">word_printed =</span> <span class="fu">case_when</span>(Word <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;MOUNTAIN&quot;</span>,</span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>                                  Word <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;CAR&quot;</span>,</span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>                                  Word <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">&quot;CHILD&quot;</span>,</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>                                  Word <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">&quot;HOUSE&quot;</span>),</span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>         <span class="at">Instruction =</span> <span class="fu">paste0</span>(<span class="st">&quot;For your first task, please &quot;</span>, condition_printed, <span class="st">&quot; to think about a &quot;</span>, word_printed, <span class="st">&quot; for the next five minutes. I will be back in five minutes&quot;</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Instruction, Condition, Word, Target, Order, condition_printed, word_printed)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># print conditions for verification</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>dat_annotated <span class="sc">|&gt;</span></span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Condition, Word, Target, Order) <span class="sc">|&gt;</span></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="co"># ## original english</span></span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a><span class="co"># dat_annotated &lt;- dat |&gt;</span></span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a><span class="co">#   mutate(Target = case_when(Word %in% c(1, 2) ~ 1,</span></span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co">#                             Word %in% c(3, 4) ~ 2),</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="co">#          condition_printed = case_when(Condition == 1 ~ &quot;try NOT&quot;,</span></span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a><span class="co">#                                        Condition == 2 ~ &quot;try&quot;),</span></span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co">#          word_printed = case_when(Word == 1 ~ &quot;MOUNTAIN&quot;,</span></span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="co">#                                   Word == 2 ~ &quot;CAR&quot;,</span></span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a><span class="co">#                                   Word == 3 ~ &quot;CHILD&quot;,</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co">#                                   Word == 4 ~ &quot;HOUSE&quot;),</span></span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="co">#          Instruction = paste0(&quot;For your first task, please &quot;, condition_printed, &quot; to think about a &quot;, word_printed, &quot; for the next five minutes. I will be back in five minutes&quot;)) |&gt;</span></span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a><span class="co">#   select(Instruction, Condition, Word, Target, Order, condition_printed, word_printed)</span></span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="do">## translated german</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>dat_annotated <span class="ot">&lt;-</span> dat <span class="sc">|&gt;</span></span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">Target =</span> <span class="fu">case_when</span>(Word <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">1</span>, <span class="dv">2</span>) <span class="sc">~</span> <span class="dv">1</span>,</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>                            Word <span class="sc">%in%</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">4</span>) <span class="sc">~</span> <span class="dv">2</span>),</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>         <span class="at">condition_printed =</span> <span class="fu">case_when</span>(Condition <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;NICHT an&quot;</span>,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>                                       Condition <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;an&quot;</span>),</span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>         <span class="at">word_printed =</span> <span class="fu">case_when</span>(Word <span class="sc">==</span> <span class="dv">1</span> <span class="sc">~</span> <span class="st">&quot;einen BERG&quot;</span>,</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>                                  Word <span class="sc">==</span> <span class="dv">2</span> <span class="sc">~</span> <span class="st">&quot;ein AUTO&quot;</span>,</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a>                                  Word <span class="sc">==</span> <span class="dv">3</span> <span class="sc">~</span> <span class="st">&quot;ein KIND&quot;</span>,</span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>                                  Word <span class="sc">==</span> <span class="dv">4</span> <span class="sc">~</span> <span class="st">&quot;ein HAUS&quot;</span>),</span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a>         <span class="at">Instruction =</span> <span class="fu">paste0</span>(<span class="st">&quot;Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten &quot;</span>, condition_printed, <span class="st">&quot; &quot;</span>, word_printed, <span class="st">&quot; zu denken. Ich bin in fünf Minuten zurück.&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a>  <span class="fu">select</span>(Instruction, Condition, Word, Target, Order, condition_printed, word_printed)</span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a> </span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="co"># print conditions for verification</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a>dat_annotated <span class="sc">|&gt;</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a>  <span class="fu">count</span>(Condition, Word, Target, Order) <span class="sc">|&gt;</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a>  <span class="fu">kable_classic</span>(<span class="at">full_width =</span> <span class="cn">FALSE</span>)</span></code></pre></div>
 <table class=" lightable-classic" style="font-family: &quot;Arial Narrow&quot;, &quot;Source Sans Pro&quot;, sans-serif; width: auto !important; margin-left: auto; margin-right: auto;">
 <thead>
 <tr>
