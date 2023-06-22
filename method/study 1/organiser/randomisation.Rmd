@@ -68,7 +68,7 @@ dat_annotated <- dat |>
                                   Word == 2 ~ "ein AUTO",
                                   Word == 3 ~ "ein KIND",
                                   Word == 4 ~ "ein HAUS"),
-         Instruction = paste0("Versuchen Sie bei Ihrer ersten Aufgabe, in den nächsten fünf Minuten ", condition_printed, " ", word_printed, " zu denken. Ich bin in fünf Minuten zurück.")) |>
+         Instruction = paste0("Versuchen Sie bei Ihrer ersten Aufgabe in den nächsten fünf Minuten ", condition_printed, " ", word_printed, " zu denken. Ich bin in fünf Minuten zurück.")) |>
   select(Instruction, Condition, Word, Target, Order, condition_printed, word_printed)
 
  
