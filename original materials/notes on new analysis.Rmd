@@ -1,0 +1,13 @@
+
+misinterpretation of non significant p values.
+
+
+contrast coding vs dummy coding?
+
+linear probability model should be changed to a... logistic model?
+
+stimulus should not be entered as both a fixed and random effect
+
+conclusions should be based on predictions rather than model parameters
+
+predictions should be made with more careful regard to what random effect is being predicted for
