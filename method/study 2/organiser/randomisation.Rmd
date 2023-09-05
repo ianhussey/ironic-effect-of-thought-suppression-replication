@@ -1,0 +1,87 @@
+---
+title: "Study 1 condition assignment"
+author: "Ian Hussey"
+date: "`r format(Sys.time(), '%d %B %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(knitr)
+library(kableExtra)
+library(writexl)
+
+```
+
+# Seed
+
+```{r}
+
+set.seed(42)
+
+```
+
+# Create condition assignment
+
+```{r}
+
+# generate conditions
+dat <- tibble(Condition = c(rep(1, times = 40), rep(2, times = 40)),
+              Word = c(rep(1, times = 10), rep(2, times = 10), rep(3, times = 10), rep(4, times = 10),
+                       rep(1, times = 10), rep(2, times = 10), rep(3, times = 10), rep(4, times = 10)))
+
+## translated german
+dat_annotated <- dat |>
+  mutate(condition_printed = case_when(Condition == 1 ~ "NICHT an ",
+                                       Condition == 2 ~ "an "),
+         word_printed = case_when(Word == 1 ~ "einen GORILLA",
+                                  Word == 2 ~ "einen TIGER",
+                                  Word == 3 ~ "ESSEN",
+                                  Word == 4 ~ "KRANKHEIT"),
+         word_printed2 = case_when(Word == 1 ~ "ein GORILLA",
+                                  Word == 2 ~ "ein TIGER",
+                                  Word == 3 ~ "ESSEN",
+                                  Word == 4 ~ "KRANKHEIT"), 
+         Instruction1 = paste0( "Bitte verbalisieren Sie in den nächsten Minuten Ihre Gedanken wie zuvor, mit einer Ausnahme. ", "Versuchen Sie diesmal ", condition_printed, word_printed, " zu denken. ",
+      "Jedes Mal, wenn Sie ", word_printed, " erwähnen oder Ihnen ", word_printed2, " in den Sinn kommt, ",
+      "läuten Sie bitte die Glocke auf dem Tisch vor Ihnen.")) |>
+  mutate(word_printedTWO = case_when(Condition == 2 ~ " d.h ",
+    TRUE ~ " diesmal "),
+    Instruction2 = paste0("Danke, dass Sie diese Aufgabe gelöst haben, es ist nur noch eine Runde übrig. Bitte verbalisieren Sie in den nächsten Minuten Ihre Gedanken wie zuvor,", word_printedTWO, "versuchen Sie, an ", word_printed, " zu denken. ",
+      "Jedes Mal, wenn Sie ", word_printed, " erwähnen oder Ihnen ", word_printed2, " in den Sinn kommt, ",
+      "läuten Sie bitte die Glocke auf dem Tisch vor Ihnen."
+    ))  
+
+ 
+
+# print conditions for verification
+dat_annotated |>
+  count(Condition, Word) |>
+  kable() |>
+  kable_classic(full_width = FALSE)
+
+# shuffle rows
+dat_shuffled <- dat_annotated |>
+  dplyr::sample_frac(size = 1) %>% 
+  mutate(id = 1:80) %>% 
+  select(id, everything())
+
+# save
+write_csv(dat_shuffled, "condition_assignments.csv")
+
+```
+
