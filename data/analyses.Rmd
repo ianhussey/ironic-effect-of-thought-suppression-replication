@@ -1,0 +1,353 @@
+---
+title: "Analyses"
+author: "Ian Hussey"
+date: "`r format(Sys.time(), '%d %B, %Y')`"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+```{r, include=FALSE}
+
+knitr::opts_chunk$set(message = FALSE,
+                      warning = FALSE)
+
+```
+
+# Dependencies
+
+```{r}
+
+library(tidyverse)
+library(readxl)
+library(janitor)
+library(irr)
+library(afex)
+library(emmeans)
+library(effectsize)
+library(knitr)
+library(kableExtra)
+
+```
+
+# Get data
+
+```{r}
+
+data_study1 <- read_xlsx("Results_sheet_study1_hussey_elson.xlsx") |>
+  clean_names() |>
+  filter(participant_id < 1000) |>
+  select(participant_id, 
+         # methods variables
+         condition, target_word, time_pressure_order,
+         # individual raters' scores
+         target_low1_coder1, target_low2_coder1, target_high1_coder1, target_high2_coder1, 
+         nontarget_low1_coder1, nontarget_low2_coder1, nontarget_high1_coder1, nontarget_high2_coder1, 
+         target_low1_coder2, target_low2_coder2, target_high1_coder2, target_high2_coder2, 
+         nontarget_low1_coder2, nontarget_low2_coder2, nontarget_high1_coder2, nontarget_high2_coder2, 
+         # compound variables already scored in the excel sheet
+         mean_target_low, mean_target_high, mean_nontarget_low, mean_nontarget_high)
+
+data_study2 <- read_xlsx("Results_sheet_study2_hussey_elson.xlsx") |>
+  clean_names() |>
+  filter(participant_id < 1000) |>
+  select(participant_id, 
+         # method variables
+         condition, targetword, 
+         # individual raters' scores
+         mentions_period2_coder1 = a_period_2_coder1, 
+         rings_period2_coder1 = b_period_2_coder1, 
+         both_period2_coder1 = c_period_2_coder1, 
+         mentions_period2_coder2 = a_period_2_coder2, 
+         rings_period2_coder2 = b_period_2_coder2, 
+         both_period2_coder2 = c_period_2_coder2, 
+         # compound variables already scored in the excel sheet
+         sum_score = sum_abc_period2_final) |>
+  mutate(all_period2_coder1 = mentions_period2_coder1 + rings_period2_coder1 + both_period2_coder1,
+         all_period2_coder2 = mentions_period2_coder2 + rings_period2_coder2 + both_period2_coder2)
+
+data_study2_narrow <- read_xlsx("Results_sheet_study2_hussey_elson_all_narrow_scoring.xlsx") |>
+  clean_names() |>
+  filter(participant_id < 1000) |>
+  select(participant_id, 
+         # method variables
+         condition, targetword, 
+         # individual raters' scores
+         mentions_period2_coder1 = a_period_2_coder1, 
+         rings_period2_coder1 = b_period_2_coder1, 
+         both_period2_coder1 = c_period_2_coder1, 
+         mentions_period2_coder2 = a_period_2_coder2, 
+         rings_period2_coder2 = b_period_2_coder2, 
+         both_period2_coder2 = c_period_2_coder2, 
+         # compound variables already scored in the excel sheet
+         sum_score = sum_abc_period2_final) |>
+  mutate(all_period2_coder1 = mentions_period2_coder1 + rings_period2_coder1 + both_period2_coder1,
+         all_period2_coder2 = mentions_period2_coder2 + rings_period2_coder2 + both_period2_coder2)
+
+```
+
+# IRR
+
+## Study 1
+
+```{r}
+
+cohens_kappa <- function(.data, var1, var2){
+  
+  var1_name <- deparse(substitute(var1))
+  var2_name <- deparse(substitute(var2))
+  
+  res <- .data |>
+    select({{ var1 }}, {{ var2 }}) |>
+    kappa2()
+  
+  .data |>
+    summarize(percent_agreement = mean({{ var1 }} == {{ var2 }})*100) |>
+    mutate(var1 = var1_name,
+           var2 = var2_name,
+           kappa = res$value)
+}
+
+reliability_results_study1 <- 
+  bind_rows(
+    cohens_kappa(data_study1, target_low1_coder1, target_low1_coder2),
+    cohens_kappa(data_study1, target_low2_coder1, target_low2_coder2),
+    cohens_kappa(data_study1, target_high1_coder1, target_high1_coder2),
+    cohens_kappa(data_study1, target_high2_coder1, target_high2_coder2),
+    cohens_kappa(data_study1, nontarget_low1_coder1, nontarget_low1_coder2),
+    cohens_kappa(data_study1, nontarget_low2_coder1, nontarget_low2_coder2),
+    cohens_kappa(data_study1, nontarget_high1_coder1, nontarget_high1_coder2),
+    cohens_kappa(data_study1, nontarget_high2_coder1, nontarget_high2_coder2)
+  ) |>
+  separate(var1, into = c("trial_type", "condition", "coder")) |>
+  select(trial_type, condition, percent_agreement, kappa)
+
+reliability_results_study1 |>
+  mutate_if(is.numeric, round_half_up, digits = 2) |>
+  kable(align = "r") |>
+  kable_classic(full_width = FALSE)
+
+```
+
+## Study 2
+
+```{r}
+
+calculate_icc21 <- function(.data, var1, var2) {
+  
+  var1_name <- deparse(substitute(var1))
+  var2_name <- deparse(substitute(var2))
+  
+  .data %>%
+    select({{ var1 }}, {{ var2 }}) %>%
+    psych::ICC() %>%
+    .$results %>%
+    as_tibble() %>%
+    filter(type == "ICC2") %>%
+    mutate(var1 = var1_name,
+           var2 = var2_name) %>%
+    select(var1, var2, ICC21 = ICC, lower = `lower bound`, upper = `upper bound`)
+}
+
+reliability_results_study2 <- 
+  bind_rows(
+    calculate_icc21(data_study2, mentions_period2_coder1, mentions_period2_coder2),
+    calculate_icc21(data_study2, rings_period2_coder1, rings_period2_coder2),
+    calculate_icc21(data_study2, both_period2_coder1, both_period2_coder2),
+    calculate_icc21(data_study2, all_period2_coder1, all_period2_coder2)
+  ) |>
+  separate(var1, into = c("response_type", "time_point", "coder")) |>
+  select(response_type, ICC21, lower, upper)
+
+reliability_results_study2 |>
+  mutate_if(is.numeric, round_half_up, digits = 2) |>
+  kable(align = "r") |>
+  kable_classic(full_width = FALSE)
+
+```
+
+## Study 2 - narrow scoring for all stimului
+
+```{r}
+
+reliability_results_study2_narrow <- 
+  bind_rows(
+    calculate_icc21(data_study2_narrow, mentions_period2_coder1, mentions_period2_coder2),
+    calculate_icc21(data_study2_narrow, rings_period2_coder1, rings_period2_coder2),
+    calculate_icc21(data_study2_narrow, both_period2_coder1, both_period2_coder2),
+    calculate_icc21(data_study2_narrow, all_period2_coder1, all_period2_coder2)
+  ) |>
+  separate(var1, into = c("response_type", "time_point", "coder")) |>
+  select(response_type, ICC21, lower, upper)
+
+reliability_results_study2_narrow |>
+  mutate_if(is.numeric, round_half_up, digits = 2) |>
+  kable(align = "r") |>
+  kable_classic(full_width = FALSE)
+
+```
+
+# Scoring narrow vs broad
+
+## Sanity check scoring is done correctly using a scatter plot
+
+```{r fig.height=5, fig.width=5}
+
+compare_scores <- 
+  full_join(
+    data_study2 |>
+      select(participant_id, sum_score_broad = sum_score, targetword),
+    data_study2_narrow |>
+      select(participant_id, sum_score_narrow = sum_score),
+    by = "participant_id"
+  ) |>
+  mutate(targetword = as.factor(targetword))
+
+ggplot(compare_scores, aes(sum_score_broad, sum_score_narrow)) +
+  geom_abline(slope = 1, intercept = 0, color = "grey") +
+  geom_point(alpha = 0.3) +
+  coord_cartesian(xlim = c(0,100), ylim = c(0,100)) +
+  facet_wrap(~ targetword)
+
+```
+
+All looks good - scoring only differed for two target stimuli, and narrow score should always be equal to or lower than broad, and it is.
+
+## Does difference in scoring make a difference?
+
+When the differences in scoring method was raised with the organisers, they suggested that heterogeneity in scoring method between sites was allowable. We think this is a priori undesirable. This analysis checks whether scoring our own data using the broad* method vs narrow method makes a difference to the average of the resulting scores.
+
+*NB technically the broad method is broad-for-two-target-stimuli-and-narrow-for-two, and the narrow method is narrow-for-all-four-target-stimuli.
+
+```{r}
+
+compare_scores |>
+  summarize(mean_score_broad = mean(sum_score_broad),
+            sd_score_broad = sd(sum_score_broad),
+            mean_score_narrow = mean(sum_score_narrow),
+            sd_score_narrow = sd(sum_score_narrow)) |>
+  mutate(cohen_d = (mean_score_broad - mean_score_narrow) / sqrt((sd_score_broad^2 + sd_score_narrow^2) / 2)) |>
+  mutate_if(is.numeric, round_half_up, digits = 2) |>
+  kable(align = "r") |>
+  kable_classic(full_width = FALSE)
+
+compare_scores |>
+  group_by(targetword) |>
+  summarize(mean_score_broad = mean(sum_score_broad),
+            sd_score_broad = sd(sum_score_broad),
+            mean_score_narrow = mean(sum_score_narrow),
+            sd_score_narrow = sd(sum_score_narrow)) |>
+  mutate(cohen_d = (mean_score_broad - mean_score_narrow) / sqrt((sd_score_broad^2 + sd_score_narrow^2) / 2)) |>
+  mutate_if(is.numeric, round_half_up, digits = 2) |>
+  kable(align = "r") |>
+  kable_classic(full_width = FALSE)
+
+```
+
+Difference in scoring methods results in a difference in mean scores of Cohen's d = .35. This may  therefore have the potential to introduce heterogeneity between sites.
+
+# Analyses
+
+## Study 1
+
+Using the simpler 2X2 mixed within-between anova from the preregistration.
+
+```{r}
+
+# Transform data using pivot_longer in tidyverse style
+data_study1_long <- data_study1 %>%
+  select(participant_id, mean_target_low, mean_target_high, condition_suppression_concentration = condition) |>
+  mutate(condition_suppression_concentration = case_when(condition_suppression_concentration == 1 ~ "suppression",
+                                                         condition_suppression_concentration == 2 ~ "concentration")) |>
+  pivot_longer(cols = c(mean_target_low, 
+                        mean_target_high),
+               names_to = "condition_high_low_pressure",
+               values_to = "meancorrectresponse")
+  
+# 2 x 2 mixed ANOVA
+res_study1 <- aov_ez(id = "participant_id", 
+                     dv = "meancorrectresponse", 
+                     between = "condition_suppression_concentration", 
+                     within = "condition_high_low_pressure",
+                     data = data_study1_long)
+
+summary(res_study1)
+# emmeans(res_study1, pairwise ~ condition_suppression_concentration|condition_high_low_pressure, adjust = "none") 
+# emmeans(res_study1, pairwise ~ condition_high_low_pressure|condition_suppression_concentration, adjust = "none") 
+
+#Plot 2 x 2
+# emmip(res_study1, condition_suppression_concentration~condition_high_low_pressure, xlab = "Condition", ylab = "Mean correct response", CIs = T) 
+
+emmip(res_study1, condition_high_low_pressure~condition_suppression_concentration, xlab = "Condition", ylab = "Mean correct response", CIs = T) 
+
+```
+
+What does `mean correct response` refer to again?? Is the direction of the effect as predicted?
+
+## Study 2
+
+Using a t-test rather than an ANOVA for the pairwise group comparison (ANOVA was used in the prereg), and ignoring the exploratory targetword factor.
+
+```{r}
+
+data_study2_tidied <- data_study2 |>
+  rename(condition_suppression_concentration = condition) |>
+  mutate(condition_suppression_concentration = 
+           case_when(condition_suppression_concentration == 1 ~ "suppression",
+                     condition_suppression_concentration == 2 ~ "concentration"))
+  
+# 2 x 2 mixed ANOVA
+# res_study2 <- aov_ez(id = "participant_id", 
+#                      dv = "sum_score", 
+#                      between = c("condition_suppression_concentration", "targetword"), 
+#                      data = data_study2_tidied)
+# summary(res_study2)
+
+t.test(sum_score ~ condition_suppression_concentration, 
+       data = data_study2_tidied)
+
+cohens_d(sum_score ~ condition_suppression_concentration, 
+         data = data_study2_tidied)
+
+```
+
+## Study 2 narrow scored
+
+```{r}
+
+data_study2_narrow_tidied <- data_study2_narrow |>
+  rename(condition_suppression_concentration = condition) |>
+  mutate(condition_suppression_concentration = 
+           case_when(condition_suppression_concentration == 1 ~ "suppression",
+                     condition_suppression_concentration == 2 ~ "concentration"))
+  
+# 2 x 2 mixed ANOVA
+# res_study2_narrow <- aov_ez(id = "participant_id", 
+#                      dv = "sum_score", 
+#                      between = c("condition_suppression_concentration", "targetword"), 
+#                      data = data_study2_narrow_tidied)
+# summary(res_study2_narrow)
+
+t.test(sum_score ~ condition_suppression_concentration, 
+       data = data_study2_narrow_tidied)
+
+cohens_d(sum_score ~ condition_suppression_concentration, 
+         data = data_study2_narrow_tidied)
+
+```
+
+Note that changing the scoring strategy to all-narrow scoring changes the results, in our dataset at least, from significant and Cohen's d = .45 to non-significant and Cohen's d = .37. This highlights the potential for how heterogeneity between sites in their scoring method could influence the results obtained, or the heterogeneity between the sites.
+
+# Session info
+
+```{r}
+
+sessionInfo()
+
+```
+
+
