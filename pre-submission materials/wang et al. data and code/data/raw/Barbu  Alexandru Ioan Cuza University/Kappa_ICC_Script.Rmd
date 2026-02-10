@@ -1,0 +1,145 @@
+---
+title: "Kappa Script"
+author: "Author"
+date: '`r format(Sys.time(), "%d %b, %Y")`'
+output: 
+  html_document:
+    code_folding: hide
+    theme: spacelab
+    toc: true
+    toc_float: true
+    toc_depth: 3
+---
+
+# Packages
+```{r packages, message=FALSE, warning=FALSE, include=TRUE}
+
+# packages
+# install (if needed) and load packages
+packages <- c("here", # relative paths
+              "rio", # import/export data
+              "tidyverse", # data cleaning
+              "psych") # kappa
+if (!require("librarian")) install.packages("librarian") 
+package.check <- lapply(
+  packages,
+  FUN = function(x) {
+    if (!require(x, character.only = TRUE)) {
+      librarian:: shelf(packages)
+      }
+    }
+)
+# load packages
+invisible(lapply(packages, library, character.only = TRUE))
+
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE, warning = FALSE, message = FALSE)
+```
+
+# Study 1
+```{r}
+study1_dat <- import("RRR results input spreadsheet Study 1_RO.xlsx") 
+```
+
+
+# Kappa
+## target low 1
+```{r}
+r1 <- study1_dat$target.low1.coder1
+r2 <- study1_dat$target.low1.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k1 <- k$kappa
+k1
+```
+
+## target low 2
+```{r}
+r1 <- study1_dat$target.low2.coder1
+r2 <- study1_dat$target.low2.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k2 <- k$kappa
+k2
+```
+
+
+
+## target high 1
+```{r}
+r1 <- study1_dat$target.high1.coder1
+r2 <- study1_dat$target.high1.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k3 <- k$kappa
+k3
+```
+
+## target high 2
+```{r}
+r1 <- study1_dat$target.high2.coder1
+r2 <- study1_dat$target.high2.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k4 <- k$kappa
+k4
+```
+## non-target low 1
+```{r}
+r1 <- study1_dat$nontarget.low1.coder1
+r2 <- study1_dat$nontarget.low1.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k5 <- k$kappa
+k5
+```
+
+## non-target low 2
+```{r}
+r1 <- study1_dat$nontarget.low2.coder1
+r2 <- study1_dat$nontarget.low2.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k6 <- k$kappa
+k6
+```
+
+## non-target high 1
+```{r}
+r1 <- study1_dat$nontarget.high1.coder1
+r2 <- study1_dat$nontarget.high1.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k7 <- k$kappa
+k7
+```
+
+## non-target high 2
+```{r}
+r1 <- study1_dat$nontarget.high2.coder1
+r2 <- study1_dat$nontarget.high2.coder2
+
+k_dat = cbind(r1, r2)
+k <- psych::cohen.kappa(x = k_dat)
+k8 <- k$kappa
+k8
+```
+
+# Compute average Kappa
+```{r}
+
+kappa <- c(k1, k2, k3, k4, k5, k6, k7, k8)
+
+avg_kappa <- mean(kappa)
+avg_kappa
+```
+

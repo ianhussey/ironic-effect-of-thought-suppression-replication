@@ -1,0 +1,855 @@
+---
+title: "Study 1: Replicating Wegner & Erber (1992)"
+author: "Kai Qin Chan with notes+reproducibility additions by Ian Hussey"
+output:
+  html_document:
+    code_folding: hide
+    highlight: haddock
+    theme: flatly
+    toc: yes
+    toc_float: yes
+---
+
+Lead authors: Deming (Adam) Wang, Kai Qin Chan, Wakefield Morys-Carter, and Martin Hagger
+
+- Version 1: Based on R codes previously approved by AAMPS editor in Oct 2022
+- Version 2: Dec 2023.
+- Version 3: June 2025.
+- Version 4: Aug 2025.
+
+System ran
+13th Gen Intel(R) Core(TM) i7-1355U   1.70 GHz
+16.0 GB (15.7 GB usable)
+
+General Warning
+RStudio may crash when looping over mixed models. If so, restart RStudio to free up RAM. 
+
+Resources consulted
+
+- https://r-workshop.mindsci.net/anova --- for effect size
+- https://stackoverflow.com/questions/68955079/how-to-print-and-skip-error-in-for-loop-in-r-with-hsd-analysis --- for skip errors
+- https://jonlefcheck.net/2013/05/20/continuing-a-for-loop-in-r-after-an-error/ --- for skip errors
+- https://irrsim.bryer.org/articles/IRRsim.html
+
+```{r include=FALSE}
+# formatting options
+# set default chunk options
+knitr::opts_chunk$set(message = FALSE, 
+                      warning = FALSE)
+
+```
+
+# Dependencies
+
+```{r}
+
+####Load libraries####
+library(readxl); library(psych); library(reshape2); library(afex); library(emmeans); library(irr); library(dplyr); library(metafor); library(forestplot); library(stringr)
+library(janitor); library(tidyr); library(knitr); library(kableExtra)
+
+####Set global options
+options(scipen=999) #Disables expressing small numbers in scientific notation, e. Otherwise it creates problematic Excel files.
+options(digits = 4)
+
+```
+
+# Load data
+
+```{r}
+
+####Create list of Excel datafiles and temp dataframes within working directory####
+file_list <- list.files(path = "../../data/processed/study 1/", 
+                        pattern="*.xlsx") #get all data with .xlsx (must define working directory first)
+file_list <- paste0("../../data/processed/study 1/", file_list)
+
+data_list <- vector("list", length = length(file_list)) # This empty list will store the dataframes read from each file
+loop_times <- numeric(100) #capture loop time
+
+df1 <- data.frame(Lab = NA_character_, Researcher = NA_character_, Country = NA_character_, Citation = NA_character_,
+                  N.initial = NA_real_, N.final = NA_real_, N.male = NA_real_, N.female = NA_real_, N.other = NA_real_, pct.N.incl = NA_real_,
+                  N.conc = NA_real_, N.supp = NA_real_,
+                  
+                  IRR = NA_real_, 
+                  
+                  min.age = NA_real_, max.age = NA_real_, mean.age = NA_real_, sd.age = NA_real_, 
+                  
+                  count.Manipchk.fail = NA_real_, count.Manipchk.pass = NA_real_, pct.Manipchk.pass = NA_real_, 
+                  count.Compliance.fail = NA_real_, count.Compliance.pass = NA_real_, pct.Compliance.pass = NA_real_,
+                  count.Probe.fail = NA_real_, count.Probe.pass = NA_real_, pct.Probe.pass = NA_real_,
+                  
+                  mean.conc.3s = NA_real_, mean.supp.3s = NA_real_, 
+                  mean.conc.10s = NA_real_, mean.supp.10s = NA_real_, 
+                  sd.conc.3s = NA_real_, sd.supp.3s = NA_real_, 
+                  sd.conc.10s = NA_real_, sd.supp.10s = NA_real_,
+                  
+                  ES.cond_TP_wordtype_replication = NA_real_, 
+                  ES.allwords.cond_TP_wordtype = NA_real_, ES.allwords.cond_wordtype = NA_real_, ES.allwords.cond_TP = NA_real_,
+                  ES.targetwords.cond = NA_real_, ES.targetwords.TP = NA_real_, ES.targetwords.cond_TP= NA_real_,
+                  ES.nontargetwords.cond = NA_real_, ES.nontargetwords.TP = NA_real_,
+                  
+                  FE.GLMM.allwordtype.Cond = NA_real_, FE.GLMM.allwordtype.TP = NA_real_, FE.GLMM.allwordtype.Wordtype = NA_real_, 
+                  FE.GLMM.allwordtype.Cond_TP = NA_real_, FE.GLMM.allwordtype.Cond_Wordtype = NA_real_, FE.GLMM.allwordtype.TP_Wordtype = NA_real_, FE.GLMM.allwordtype.cond_TP_Wordtype = NA_real_,
+                  FE.GLMM.targetword.Cond = NA_real_, FE.GLMM.targetword.TP = NA_real_, FE.GLMM.targetword.Cond_TP= NA_real_,
+                  
+                  VPC.m2 = NA_real_, VPC.m3 = NA_real_,
+                  
+                  d.low = NA_real_, d.high = NA_real_,
+                  v.low = NA_real_, v.high = NA_real_
+)
+
+####LOOP: START####
+for (i in 1:36) { #Although it is more elegant to use seq_along(), using 1:n is better for debugging. Max n = 36.
+  #if (i == 9) next #Use if  the 9th lab would be excluded because it has too few participants (n = 40)
+  start_time <- Sys.time()
+  filename = file_list[[i]]
+  message("Processing file ", i, " of ", length(file_list), ": ", file_list[i]) #Progress tracker
+  
+  RRR_WE92 <- read_excel(filename, sheet = "testdata", na = "NA") 
+  
+  # Rename columns for consistency
+  colnames(RRR_WE92) <- recode(colnames(RRR_WE92),
+                               "Participant ID" = "SubjID",
+                               "Time pressure order" = "TimePressureOrder",
+                               "Target word" = "Replication",
+                               "Condition" = "Cond"
+  )
+  
+  # Define categorical variables
+  RRR_WE92 <- RRR_WE92 %>%
+    mutate(
+      gender = factor(gender, levels = 1:4, labels = c("Female", "Male", "Other", "Prefer not to say")),
+      MC = factor(MC, levels = 1:2, labels = c("Think", "Not think")),
+      Cond = factor(Cond, levels = 1:2, labels = c("Suppression", "Concentration")),
+      Replication = factor(Replication),
+      TimePressureOrder = factor(TimePressureOrder),
+      probe.final = factor(probe.final, levels = 0:1, labels = c("pass", "fail")), #Probe: did participant fail probe? 1 = yes, 0 = no
+      Compliance = factor(Compliance, levels = 1:2, labels = c("pass", "fail")) #Compliance: complied with experimental instructions? Yes = 1, No = 2
+    )
+  
+  #Define levels of the categorical variables. I could define it in the above step, but it doesn't work.
+  levels(RRR_WE92$Replication) <- c("mountain", "car", "child", "house")
+  levels(RRR_WE92$TimePressureOrder) <- c("10s then 3s", "2s then 10s")
+  
+  ####INTER-RATER RELIABILITY, MANIPULATION CHECKS, COMPLIANCE, & SUSPICION PROBES####
+  
+  # Manipulation check: Define pass/fail conditions
+  RRR_WE92 <- RRR_WE92 %>%
+    mutate(Manipchk.pass = case_when(
+      MC == "Think" & Cond == "Concentration" ~ "pass",
+      MC == "Not think" & Cond == "Suppression" ~ "pass",
+      MC == "Think" & Cond == "Suppression" ~ "fail",
+      MC == "Not think" & Cond == "Concentration" ~ "fail"
+    ))
+  
+  RRR_WE92$Manipchk.pass <- as.factor(RRR_WE92$Manipchk.pass) #1 = fail; 2 = pass ##NEW CODE##
+  
+  # Compute Cohen's Kappa for interrater reliability (correct responses only)
+  kappa.target.low1 <- kappa2(RRR_WE92[, c("target.low1.coder1", "target.low1.coder2")], weight = "unweighted")
+  kappa.target.low2 <- kappa2(RRR_WE92[, c("target.low2.coder1", "target.low2.coder2")], weight = "unweighted")
+  kappa.target.high1 <- kappa2(RRR_WE92[, c("target.high1.coder1", "target.high1.coder2")], weight = "unweighted")
+  kappa.target.high2 <- kappa2(RRR_WE92[, c("target.high2.coder1", "target.high2.coder2")], weight = "unweighted")
+  kappa.nontarget.low1 <- kappa2(RRR_WE92[, c("nontarget.low1.coder1", "nontarget.low1.coder2")], weight = "unweighted")
+  kappa.nontarget.low2 <- kappa2(RRR_WE92[, c("nontarget.low2.coder1", "nontarget.low2.coder2")], weight = "unweighted")
+  kappa.nontarget.high1 <- kappa2(RRR_WE92[, c("nontarget.high1.coder1", "nontarget.high1.coder2")], weight = "unweighted")
+  kappa.nontarget.high2 <- kappa2(RRR_WE92[, c("nontarget.high2.coder1", "nontarget.high2.coder2")], weight = "unweighted")
+  
+  #Compute mean Cohen's kappa for the DVs
+  meankappa <- mean(c
+                    (kappa.target.low1[["value"]], 
+                      kappa.target.low2[["value"]],
+                      kappa.target.high1[["value"]],
+                      kappa.target.high2[["value"]],
+                      kappa.nontarget.low1[["value"]],
+                      kappa.nontarget.low2[["value"]],
+                      kappa.nontarget.high1[["value"]],
+                      kappa.nontarget.high2[["value"]]), na.rm = TRUE)
+  
+  #Fill in the manipulation checks, compliance, and probe numbers first, before subsetting based on preregistered exclusion criteria
+  df1$N.initial = nrow(RRR_WE92)
+  df1$count.Manipchk.pass <- sum(RRR_WE92$Manipchk.pass == "pass", na.rm = TRUE)
+  df1$count.Manipchk.fail <- sum(RRR_WE92$Manipchk.pass == "fail", na.rm = TRUE)
+  df1$pct.Manipchk.pass <- sum(RRR_WE92$Manipchk.pass == "pass", na.rm = TRUE)/(sum(RRR_WE92$Manipchk.pass == "pass", na.rm = TRUE)+sum(RRR_WE92$Manipchk.pass == "fail", na.rm = TRUE))*100
+  
+  df1$count.Compliance.pass <- sum(RRR_WE92$Compliance=="pass", na.rm = TRUE)
+  df1$count.Compliance.fail <- sum(RRR_WE92$Compliance=="fail", na.rm = TRUE)
+  df1$pct.Compliance.pass <- sum(RRR_WE92$Compliance=="pass", na.rm = TRUE)/(sum(RRR_WE92$Compliance=="pass", na.rm = TRUE)+sum(RRR_WE92$Compliance=="fail", na.rm = TRUE))*100
+  
+  df1$count.Probe.pass <- sum(RRR_WE92$probe.final=="pass", na.rm = TRUE)
+  df1$count.Probe.fail <- sum(RRR_WE92$probe.final=="fail", na.rm = TRUE)
+  df1$pct.Probe.pass <-sum(RRR_WE92$probe.final=="pass", na.rm = TRUE)/(sum(RRR_WE92$probe.final=="pass", na.rm = TRUE)+sum(RRR_WE92$probe.final=="fail", na.rm = TRUE))*100
+  
+  ####Toggle between the two subsetting codes blow####
+  #Make sure the creation of long format data comes after the subsetting is done.
+  
+  ####Select only participants who passed manipulation checks, compliance checks, and suspicion probes####  
+  #RRR_WE92 <- subset(RRR_WE92, Manipchk.pass == "pass" & probe.final == "pass" & Compliance == "pass") #1 = passed manipulation checks. #DO NOT RUN for the main analyses (as specified by Editor)
+  
+  ####Select only participants who passed compliance checks, and suspicion probes####
+  RRR_WE92 <-subset(RRR_WE92, probe.final == "pass" & Compliance == "pass") #RUN THIS preregistered analysis by default
+  
+  #Convert wide format to long format for the mixed ANOVA analyses.
+  data_long<-melt(RRR_WE92, id.vars=c("SubjID", "Cond", "Replication", "TimePressureOrder"), 
+                  measure.vars=c("mean.target.low", "mean.target.high", "mean.nontarget.low", "mean.nontarget.high"),
+                  variable.name="condition",
+                  value.name="meanhit") %>% arrange("SubjID")
+  
+  #Create columns that define (split) the within-subject factors, i.e., time pressure and word type.
+  data_long$timepressure <- NA #create new variable to hold the values of time pressure
+  data_long$timepressure[data_long$condition == "mean.target.low" | data_long$condition == "mean.nontarget.low" ] <- 1
+  data_long$timepressure[data_long$condition == "mean.target.high" | data_long$condition == "mean.nontarget.high" ] <- 2
+  
+  data_long$wordtype <- NA #create new variable to hold the values of target
+  data_long$wordtype[data_long$condition == "mean.target.low" | data_long$condition == "mean.target.high" ] <- 1
+  data_long$wordtype[data_long$condition == "mean.nontarget.low" | data_long$condition == "mean.nontarget.high" ] <- 2
+  
+  #Define factors and levels of the newly-made variables
+  data_long$timepressure<-factor(data_long$timepressure,labels = c("Low", "High")) 
+  data_long$wordtype<-factor(data_long$wordtype,labels = c("Target", "Nontarget")) 
+  
+  
+  
+  #Run 2 x 2 x 2 x 2 ANOVA (as reported by E&W 1992, also in the predata MS)
+  #Using try(), only when Replication (Targetword) is a factor, because some labs did not run all Replication conditions.
+  #try() allows the loop to continue when an error is encountered.
+  
+  fourwayresult <- try(aov_ez(id = "SubjID", dv = "meanhit", data=data_long, between = c("Cond", "Replication"), within = c("timepressure", "wordtype"), anova_table = list(correction = "none", es = "pes")))
+  #Note: One lab (#5 Wake Forest Univ. did not randomize Replication with Cond, so some Replication were 1 or 0. This lab was excluded in the four-way interaction.
+  try(summary(fourwayresult))
+  fourwayresult_ES <- try(anova(object=fourwayresult, es = "pes")) #get partial eta-sq
+  
+  #Run 2 x 2 x 2 ANOVA (as reported by E&W 1992)
+  mainresult<-aov_ez(id = "SubjID", dv = "meanhit", data=data_long, 
+                     between = "Cond", within = c("timepressure", "wordtype"), anova_table = list(correction = "none", es = "pes"))
+  
+  summary(mainresult)
+  #No need to run within loop
+  #emmeans(mainresult, pairwise ~ Cond|timepressure, adjust = "none") 
+  #emmeans(mainresult, pairwise ~ timepressure|Cond, adjust = "none") 
+  #emmip(mainresult, Cond~wordtype, xlab = "Word Type", ylab = "Mean prompt-relevant associations", CIs = T) 
+  mainresult_ES <- anova(object=mainresult, es = "pes") #get partial eta-sq
+  
+  #Error tracking: Is 2 x 2 x 2 ANOVA done?
+  print("2 x 2 x 2 ANOVA done")
+  
+  #Remove rows with target words to check if there are any effects on target words
+  long3 <- data_long[!(data_long$wordtype=="target"),]
+  targetwordresult<-aov_ez(id = "SubjID", dv = "meanhit", data=long3, 
+                           between = "Cond", within = c("timepressure"), anova_table = list(correction = "none", es = "pes"))
+  summary(targetwordresult)
+  targetwordresult_ES <- anova(object=targetwordresult, es = "pes") #get partial eta-sq
+  
+  #The results are expected to be significant only for the target words. 
+  #So, we need to restrict subsequent analyses to target words only.
+  
+  #Remove rows with nontarget words, if needed
+  long2 <- data_long[!(data_long$wordtype=="nontarget"),]
+
+  #Rerun ANOVA, but now as a 2 x 2 ANOVA.
+  result2<-aov_ez(id = "SubjID", dv = "meanhit", data=long2, 
+                  between = "Cond", within = c("timepressure"), anova_table = list(correction = "none", es = "pes"))
+  
+  summary(result2)
+  #emmeans(result2, pairwise ~ Cond|timepressure, adjust = "none") #Run if needed
+  #emmeans(result2, pairwise ~ timepressure|Cond, adjust = "none") #Run if needed
+  results2_ES <- anova(object=result2, es = "pes") #get partial eta-sq
+  
+  #Error tracking: Is 2 x 2 ANOVA done?
+  print("2 x 2 ANOVA done")
+  
+  #Plot 2 x 2 (no need to run within loop. Only useful to run for specific labs) #Run if needed
+  #emmip(result2, Cond~timepressure, xlab = "Time Pressure", ylab = "Mean prompt-relevant associations", CIs = T) 
+  #emmip(result2, timepressure~Cond, xlab = "Condition", ylab = "Mean prompt-relevant associations", CIs = T) 
+  
+  #Input basic info into the empty dataframe that was previously created
+  df1$Lab=RRR_WE92$Lab[[1]]
+  df1$Researcher=RRR_WE92$Researcher[[1]]
+  df1$Country=RRR_WE92$Country[[1]]
+  df1$Citation = RRR_WE92$Table.citation[[1]]
+  df1$min.age=min(RRR_WE92$age, na.rm = TRUE)
+  df1$max.age=max(RRR_WE92$age, na.rm = TRUE)
+  df1$mean.age = mean(RRR_WE92$age, na.rm = TRUE)
+  df1$sd.age = sd(RRR_WE92$age, na.rm = TRUE)
+  
+  df1$N.final = nrow(RRR_WE92) #after exclusions are removed
+  df1$pct.N.incl = (df1$N.final)/df1$N.initial*100 #N.initial has the numbers before exclusions were removed
+  df1$N.male = as.numeric(table(RRR_WE92$gender))[2]
+  df1$N.female = as.numeric(table(RRR_WE92$gender))[1]
+  df1$N.other = as.numeric(table(RRR_WE92$gender))[3] + as.numeric(table(RRR_WE92$gender))[4]
+  
+  # original code, returns number of columns not rows
+  # df1$N.conc = length(subset(RRR_WE92, Cond == "Concentration")) 
+  # df1$N.supp = length(subset(RRR_WE92, Cond == "Suppression"))
+  # corrected code
+  df1$N.conc = nrow(subset(RRR_WE92, Cond == "Concentration"))
+  df1$N.supp = nrow(subset(RRR_WE92, Cond == "Suppression"))
+
+  df1$IRR = meankappa
+  
+  #Extract relevant means and SDs for meta-analysis; Nontarget words removed (To FIX: Why are the 2nd and 3rd means/SDs identical?)
+  df1$mean.conc.3s = mean(long2[long2$Cond == 'Concentration' & long2$timepressure == 'High' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  df1$mean.supp.3s = mean(long2[long2$Cond == 'Suppression' & long2$timepressure == 'High' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  df1$mean.conc.10s = mean(long2[long2$Cond == 'Concentration' & long2$timepressure == 'Low' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  df1$mean.supp.10s = mean(long2[long2$Cond == 'Suppression' & long2$timepressure == 'Low' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  df1$sd.conc.3s = sd(long2[long2$Cond == 'Concentration' & long2$timepressure == 'High' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  df1$sd.supp.3s = sd(long2[long2$Cond == 'Suppression' & long2$timepressure == 'High' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  df1$sd.conc.10s = sd(long2[long2$Cond == 'Concentration' & long2$timepressure == 'Low' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  df1$sd.supp.10s = sd(long2[long2$Cond == 'Suppression' & long2$timepressure == 'Low' & long2$wordtype == 'Target', 'meanhit'], na.rm = TRUE)
+  
+  #Error tracking: Basic input done?
+  print("Basic input done")
+  
+  #Effect size (partial eta sq)
+  #Fourway result
+  df1$ES.cond_TP_wordtype_replication = try(fourwayresult_ES["Cond:Replication:timepressure:wordtype", "pes"])
+  df1$ES.cond_TP_wordtype_replication <- ifelse(is.character(df1$ES.cond_TP_wordtype_replication), NA, df1$ES.cond_TP_wordtype_replication)
+  df1$ES.cond_TP_wordtype_replication <- as.numeric(df1$ES.cond_TP_wordtype_replication)
+  
+  #All words
+  df1$ES.allwords.cond_TP_wordtype = mainresult_ES["Cond:timepressure:wordtype", "pes"]
+  df1$ES.allwords.cond_wordtype = mainresult_ES["Cond:wordtype", "pes"]
+  df1$ES.allwords.cond_TP = mainresult_ES["Cond:timepressure", "pes"]
+  
+  #Only for nontarget words (i.e., target words removed)
+  df1$ES.nontargetwords.cond = targetwordresult_ES["Cond", "pes"]
+  df1$ES.nontargetwords.TP = targetwordresult_ES["timepressure", "pes"]
+  
+  #Only for target words (i.e., nontarget words removed)
+  df1$ES.targetwords.cond = results2_ES["Cond", "pes"]
+  df1$ES.targetwords.TP = results2_ES["timepressure", "pes"]
+  df1$ES.targetwords.cond_TP = results2_ES["Cond:timepressure", "pes"]
+  
+  ####Mixed models####
+  m2 <- lmer(meanhit ~ Cond*timepressure*wordtype + (1|SubjID), data_long) #The factor, Replications, is omitted. It was not required by the Editor.
+  summary(m2)
+  k1 <- coef(summary(m2))
+  df1$FE.GLMM.allwordtype.Cond <- k1["CondConcentration", "Estimate"]
+  df1$FE.GLMM.allwordtype.TP <- k1["timepressureHigh", "Estimate"] #need to change
+  df1$FE.GLMM.allwordtype.Wordtype <- k1["wordtypeNontarget", "Estimate"]
+  df1$FE.GLMM.allwordtype.Cond_TP <- k1["CondConcentration:timepressureHigh", "Estimate"]
+  df1$FE.GLMM.allwordtype.Cond_Wordtype <- k1["CondConcentration:wordtypeNontarget", "Estimate"]
+  df1$FE.GLMM.allwordtype.TP_Wordtype <- k1["timepressureHigh:wordtypeNontarget", "Estimate"]
+  df1$FE.GLMM.allwordtype.cond_TP_Wordtype <- k1["CondConcentration:timepressureHigh:wordtypeNontarget", "Estimate"] #Update: Oct 2022 (as requested by Editor)
+  
+  m3 <- lmer(meanhit ~ Cond*timepressure + (1|SubjID), long2) #Not preregistered, but followed the logic of the ANOVA where only target words were analyzed (i.e., long2)
+  summary(m3)
+  j1 <- coef(summary(m3))
+  df1$FE.GLMM.targetword.Cond <- j1["CondConcentration", "Estimate"]
+  df1$FE.GLMM.targetword.TP <- j1["timepressureHigh", "Estimate"] #need to change
+  df1$FE.GLMM.targetword.Cond_TP <- j1["CondConcentration:timepressureHigh", "Estimate"]
+  
+  ####Compute Variance Partition Components for mixed models####
+  #Resource: https://benwhalley.github.io/just-enough-r/icc-and-vpc.html
+  
+  VPC.m2 <- VarCorr(m2) %>%
+    as.data.frame() %>%
+    mutate(icc=vcov/sum(vcov)) %>%
+    select(grp, icc)
+  
+  VPC.m3 <- VarCorr(m3) %>%
+    as.data.frame() %>%
+    mutate(icc=vcov/sum(vcov)) %>%
+    select(grp, icc)
+  
+  df1$VPC.m2 <- VPC.m2$icc[1]
+  df1$VPC.m3 <- VPC.m3$icc[1]
+  
+  #Error tracking: Mixed models done?
+  print("Mixed models done")
+  
+  #Calculate d1: Enhancement effect, contrast between concentration and suppression under low load
+  d1 <- escalc(n2i = N.conc, 
+               n1i = N.supp,
+               m2i = mean.conc.10s, 
+               m1i = mean.supp.10s, #The effect size calculation is M1-M2, not M2-M1
+               sd2i = sd.conc.10s, 
+               sd1i = sd.supp.10s, 
+               data = df1, measure = "SMD", append = TRUE) #Append yi and vi to dataframe in order to check each lab's yi.
+  df1$d.low <- d1$yi #paste Cohen's d to df1; low time pressure
+  df1$v.low <- d1$vi #variance of Cohen's d
+  
+  #Calculate d2: Enhancement effect, contrast between concentration and suppression under high load
+  d2 <- escalc(n2i = N.conc, 
+               n1i = N.supp, 
+               m2i = mean.conc.3s, 
+               m1i = mean.supp.3s, 
+               sd2i = sd.conc.3s, 
+               sd1i = sd.supp.3s, #The effect size calculation is M1-M2, not M2-M1
+               data = df1, measure = "SMD", append = TRUE) 
+  df1$d.high <- d2$yi #paste Cohen's d to df1; high time pressure
+  df1$v.high <- d2$vi #variance of Cohen's d
+  
+  #Error tracking: Meta-analytic effect size done?
+  print("Effect size done")
+  
+  
+  #Add info to dataframe
+  data_list[[i]] <- df1
+  
+  #Error checking: Number of variables for each lab
+  print(ncol(df1)) #should get same number for each lab
+  
+  #Loop time calculation
+  #Sys.sleep(0.05)
+  end_time <- Sys.time()
+  loop_times[i] <- end_time - start_time #about 0.25 seconds
+  
+}
+
+```
+
+# Stitch data together
+
+```{r}
+
+#df1 <- do.call(rbind, data_list) #combine all labs' data to df1
+df1 <- bind_rows(data_list) 
+
+#df1 <- df1 %>% mutate(across(where(is.numeric), round, 3)) #round off to 3 decimal places
+df1 <- df1 %>% mutate(across(where(is.numeric), janitor::round_half_up, digits = 3)) #round off to 3 decimal places
+
+#write.csv(df1, "C:/Users/jc506932/Dropbox/RRR (Adam Wang)/RRR_WE92_all.csv") 
+write.csv(df1, "../../data/output/results_study_1_RRR_WE92_all.csv", row.names = FALSE) 
+
+#save.image("C:/Users/jc506932/Dropbox/RRR (Adam Wang)/Study 1 - R Global Environment.RData")
+
+```
+
+# summary tables for manuscript
+
+## By site
+
+```{r}
+
+# ####Clean up####
+# rm(list = setdiff(ls(), c("df1"))) #Keep only df1
+
+####Create table in manuscript####
+Study1.ms.df1 <- data.frame (Researcher = df1$Citation, #Extract last name
+                             Country = df1$Country,
+                             Pct.dataincluded = round(df1$pct.N.incl, digits = 1),
+                             Age = paste0(df1$min.age, "-", df1$max.age, "; ", round(df1$mean.age, digits = 2), "; ", round(df1$sd.age, digits = 2)),
+                             Gender = paste0(df1$N.male, ";", df1$N.female, ";", df1$N.other),
+                             ES.threeway = df1$ES.allwords.cond_TP_wordtype, #Effect size partial eta for Cond x Word Type  x Time Pressure
+                             highTP.supp = paste0(round(df1$mean.supp.3s, digits = 2), " ", "(", round(df1$sd.conc.3s, digits = 2), ")"),
+                             highTP.conc = paste0(round(df1$mean.conc.3s, digits = 2), " ", "(", round(df1$sd.conc.3s, digits = 2), ")"),
+                             lowTP.supp = paste0(round(df1$mean.supp.10s, digits = 2), " ", "(", round(df1$sd.conc.10s, digits = 2), ")"),
+                             lowTP.conc = paste0(round(df1$mean.conc.10s, digits = 2), " ", "(", round(df1$sd.conc.10s, digits = 2), ")")
+) %>%  
+  arrange(Researcher)
+
+Study1.ms.df1
+
+write.csv(Study1.ms.df1, "../../data/output/results_study_1_table1.csv", row.names = FALSE)
+
+```
+
+## Overall 
+
+```{r}
+
+####Basic information as reported in the manuscript####
+library(DescTools) #For MeanCI function below
+
+# ian addition: calculate overall SD from site SDs, Ms and Ns 
+# Overall (pooled) SD across groups, accounting for group means
+# If unbiased = TRUE (default): uses sample-variance DOF (n_i-1) and divides by sum(n) - 1
+# If unbiased = FALSE: treats SDs as population SDs and divides by sum(n)
+pool_sd_overall <- function(mean, sd, n, unbiased = TRUE, na.rm = FALSE) {
+  # Checks
+  if (!(length(mean) == length(sd) && length(sd) == length(n)))
+    stop("`mean`, `sd`, and `n` must have the same length.")
+  if (any(n <= 0, na.rm = TRUE)) stop("All `n` must be positive.")
+  if (any(sd < 0, na.rm = TRUE)) stop("All `sd` must be non-negative.")
+  
+  # Handle missing triplets jointly
+  ok <- !(is.na(mean) | is.na(sd) | is.na(n))
+  if (!all(ok)) {
+    if (!na.rm) stop("Missing values found. Set `na.rm = TRUE` to drop them.")
+    mean <- mean[ok]; sd <- sd[ok]; n <- n[ok]
+  }
+  if (length(n) == 0) return(NA_real_)
+  
+  N <- sum(n)
+  if (unbiased && N <= 1) return(NA_real_)
+  
+  # Weighted overall mean
+  mu_overall <- sum(n * mean) / N
+  
+  # Within-group sum of squares (SS_within)
+  if (unbiased) {
+    SS_within <- sum((n - 1) * (sd^2))   # sample SDs
+    denom <- N - 1
+  } else {
+    SS_within <- sum(n * (sd^2))         # population SDs
+    denom <- N
+  }
+  
+  # Between-group sum of squares (SS_between)
+  SS_between <- sum(n * (mean - mu_overall)^2)
+  
+  # Total variance and SD
+  var_total <- (SS_within + SS_between) / denom
+  sqrt(var_total)
+}
+
+
+df_manuscript <- df1 %>%
+  summarise(
+    N.initial = sum(N.initial, na.rm = TRUE), #Initial sample size = 3473
+    N.final = sum(N.final, na.rm = TRUE), #final sample size after exclusions = 3280
+    Manipulation.fail = sum(count.Manipchk.fail, na.rm = TRUE), #308
+    Manipulation.pass =sum(count.Manipchk.pass, na.rm = TRUE), #3115
+    Probe.fail = sum(count.Probe.fail, na.rm = TRUE), #total suspicion probe failures = 109
+    Probe.pass = sum(count.Probe.pass, na.rm = TRUE), #3353
+    Compliance.fail = sum(count.Compliance.fail, na.rm = TRUE), #total compliance checks failures = 75
+    Compliance.pass = sum(count.Compliance.pass, na.rm = TRUE), #3382
+    mean.age_incorrect = mean(mean.age, na.rm = TRUE), #20.75
+    mean.age_corrected = weighted.mean(x = .$mean.age, w = .$N.final, na.rm = TRUE),
+    sd.age_incorrect = sd(mean.age, na.rm = TRUE), #1.85
+    sd.age_corrected = pool_sd_overall(mean = .$mean.age, sd = .$sd.age, n = .$N.final)
+  )
+
+df_manuscript |>
+  pivot_longer(cols = everything(), 
+               names_to = "column",
+               values_to = "value") |>
+  kable() |>
+  kable_classic(full_width = FALSE)
+
+```
+
+Note that original code calculates overall mean and SD age incorrectly. Original code calculates the mean of the mean-age-per-site (ignoring differences in N) the SD of the mean-age-per-site (can't derive SD from means).
+
+- Original: M = 20.75, SD = 1.85
+- Corrected: M = 20.58, SD = 4.01
+
+# IRR and ANOVAs
+
+```{r}
+
+#IRR - target prompted response
+round(MeanCI(df1$IRR), 3)
+
+#Four-way ANOVA interaction (all words)
+round(MeanCI(df1$ES.cond_TP_wordtype_replication, na.rm = T), 3) #4-way
+
+#Three-way ANOVA interaction (for non-target words)
+round(MeanCI(df1$ES.nontargetwords.cond), 3)
+round(MeanCI(df1$ES.nontargetwords.TP), 3)
+
+#Two-way ANOVA interaction (for target words)
+round(MeanCI(df1$ES.targetwords.cond_TP), 3) #2-way
+round(MeanCI(df1$ES.targetwords.cond), 3)
+round(MeanCI(df1$ES.targetwords.TP), 3)
+
+#Mixed models
+round(MeanCI(df1$FE.GLMM.allwordtype.cond_TP_Wordtype), 3) #3-way
+round(MeanCI(df1$FE.GLMM.allwordtype.Cond_TP), 3) #2-way
+round(MeanCI(df1$FE.GLMM.allwordtype.Cond), 3)
+round(MeanCI(df1$FE.GLMM.allwordtype.TP), 3)
+round(MeanCI(df1$FE.GLMM.allwordtype.Wordtype), 3)
+round(MeanCI(df1$FE.GLMM.allwordtype.Cond_Wordtype), 3)
+round(MeanCI(df1$FE.GLMM.allwordtype.TP_Wordtype), 3)
+
+round(MeanCI(df1$FE.GLMM.targetword.Cond_TP), 3) #2-way
+round(MeanCI(df1$FE.GLMM.targetword.Cond), 3)
+round(MeanCI(df1$FE.GLMM.targetword.TP), 3)
+
+round(MeanCI(df1$VPC.m2), 3)
+round(MeanCI(df1$VPC.m3), 3)
+
+####Other optional codes####
+describeBy(long2$meanhit, group = long2$Cond:long2$timepressure)
+
+```
+
+# Meta-analysis over model results
+
+```{r}
+
+#UPDATE: Jun 2022 (as requested by Editor)
+#This update specifies the four target words as random factor.
+#Incidentally, the variable name for the four target words is called 'replication'. This word 'replication' is also used in the orignial Wegner & Erber article.
+#Resource: For specifying the random effect, see ourcodingclub.github.io/tutorials/mixed-models/
+
+####Additional notes on mixed models####
+#See another script that tests model convergence (ModelConvergence Study 1.r).
+#m1 below is NOT USED because m1 converged only for 7 labs' data. No point reporting fixed estimates of these 7 labs.
+#m1 <- lmer(meanhit ~ Cond*timepressure*Replication + (1|SubjID) + (1|Replication), long2) 
+#Corrected in Oct 22: Participant is a random intercept; changed from glmer to lmer.
+#Note also that the dataframe is long2 (nontarget words removed), not data_long.
+#summary(m1) 
+
+####INPUT COUNTRY-LEVEL INFORMATION###
+asian_countries <- c("China", "Indonesia", "Malaysia", "Singapore")
+df1$Region <- factor(
+  ifelse(df1$Country %in% asian_countries, "Asian", "Non-Asian"),
+  levels = c("Non-Asian", "Asian")
+)
+
+```
+
+## low time pressure
+
+```{r}
+####****META ANALYSIS***####
+overalld1 <- rma(yi = d.low, vi = v.low, data = df1)
+summary(overalld1) 
+
+```
+
+## high time pressure
+
+```{r}
+overalld2 <- rma(yi = d.high, vi = v.high, data = df1)
+summary(overalld2) 
+
+```
+
+## Other 
+
+```{r}
+
+df.meta <- data.frame(diamond.d1 = overalld1$beta[1], #May not be necessary.
+                      diamond.d2 = overalld2$beta[1]) #Store the meta-analytic overall eff size in a new dataframe
+
+#Only three labs showed the immediate enhancement effect (d.low < 0 & d.high > 0)
+df1 %>%
+  filter(d.low < 0, d.high > 0)
+
+```
+
+# Re-analyze d1 and d2 with Region as a moderator
+
+## low time pressure
+
+```{r}
+
+overalld1.region <- rma(yi = d.low, vi = v.low, mods = ~ Region, data = df1)
+summary(overalld1.region)
+
+```
+
+## high time pressure
+
+```{r}
+
+overalld2.region <- rma(yi = d.high, vi = v.high, mods = ~ Region, data = df1)
+summary(overalld2.region)
+
+```
+
+# Re-analyze d1 and d2 with low IRRs removed
+
+## low time pressure
+
+```{r}
+
+df1.IRRpass <- subset(df1, IRR > .71)
+overalld1.IRRpass <- rma(yi = d.low, vi = v.low, data = df1.IRRpass)
+summary(overalld1.IRRpass) #low time pressure
+
+```
+
+## high time pressure
+
+```{r}
+
+overalld2.IRRpass <- rma(yi = d.high, vi = v.high, data = df1.IRRpass)
+summary(overalld2.IRRpass) #high time pressure
+
+```
+
+# Forest plot
+
+```{r}
+####NEW: JUNE 2022###
+###INTENTION: SPLIT d1 and d2 from d3, as requested by Editor###
+
+
+# Step 1: Prepare and reshape dataframe
+df2.long <- df1 %>%
+  select(Researcher, d.low, d.high, v.low, v.high) %>%
+  mutate(
+    Researcher = df1$Citation,
+    Country = df1$Country,
+    d.low.LB = d.low - 1.96 * sqrt(v.low),
+    d.low.UB = d.low + 1.96 * sqrt(v.low),
+    d.high.LB = d.high - 1.96 * sqrt(v.high),
+    d.high.UB = d.high + 1.96 * sqrt(v.high)
+  ) %>% 
+  arrange(Researcher) %>%
+  pivot_longer(
+    cols = c(d.low, d.high),
+    names_to = "Group",
+    names_pattern = "d\\.(.*)",
+    values_to = "mean" #Cohen's d goes here
+  ) %>%
+  mutate(
+    lower = if_else(Group == "low", d.low.LB, d.high.LB),
+    upper = if_else(Group == "low", d.low.UB, d.high.UB)
+  ) %>%
+  select(Researcher, Country, Group, mean, lower, upper)
+
+#Add meta-analytic summary into df2.long
+sum_low  <- list(mean = -0.499, lower = -0.591, upper = -0.406) #d.low
+sum_high <- list(mean = -0.413, lower = -0.511, upper = -0.314) #d.high
+
+# Add one summary row per group
+summary_rows <- tibble::tibble(
+  Researcher = "Summary",
+  Country    = "",
+  Group      = c("low", "high"),
+  mean       = c(sum_low$mean,  sum_high$mean),
+  lower      = c(sum_low$lower, sum_high$lower),
+  upper      = c(sum_low$upper, sum_high$upper),
+  is_summary = TRUE
+)
+
+# Bind to the long data and order so each summary is LAST within its group
+df2.plot <- df2.long %>%
+  dplyr::mutate(is_summary = FALSE) %>%
+  dplyr::bind_rows(summary_rows) %>%
+  dplyr::arrange(factor(Group, levels = c("low","high")), is_summary)
+
+# Step 2: Open the PNG device with A4 dimensions (in pixels)
+png("../../data/output/study1_forestplot1.png", 
+    width = 8.27 * 300,    # 8.27 inches × 300 dpi
+    height = 11.69 * 300,  # 11.69 inches × 300 dpi
+    res = 300)
+
+#Forest plot code
+# Forest plot with per-group summaries
+df2.plot |>
+  dplyr::group_by(Group) |>
+  forestplot(
+    labeltext = c(Researcher, Country),
+    mean  = mean,
+    lower = lower,
+    upper = upper,
+    is.summary = is_summary,          # <- marks the two summary rows
+    ci.vertices = TRUE,
+    ci.vertices.height = 0.05,
+    boxsize = 0.2,
+    align = c("l", "l"),
+    txt_gp = fpTxtGp(
+      label = gpar(cex = 0.95),  # Regular text
+      ticks = gpar(cex = 0.7),  # Axis labels
+      xlab = gpar(cex = 0.95),   # X-axis title
+      title = gpar(cex = 1.0)   # Main title (if any)
+    ),
+    lineheight = unit(0.7, "cm"),
+    xlab = "Cohen's d",
+    legend_args = fpLegend(pos = list("right"), gp = gpar(fontsize = 10))
+  ) |>
+  fp_add_header(Researcher = c("", "Author(s)"),
+                Country    = c("", "Country")) |>
+  fp_add_lines(h_3 = gpar(lty = 1),
+               h_39 = gpar(lwd = 1, columns = 1:2, col = "#000044")) |>
+  fp_set_style(
+    box     = c("blue", "darkred") |> lapply(function(x) gpar(fill = x, col = "#555555")),
+    summary = list(
+      gpar(fill = "blue", col = NA),  #for d.low
+      gpar(fill = "darkred", col = NA)  #for d.high
+    ),
+    default = gpar(vertices = TRUE)
+  ) |>
+  fp_set_zebra_style("#EFEFEF")
+
+# Close the png device
+dev.off()
+
+```
+
+# forest plot 2
+
+"RRR_Hyperaccesibility.xlsx" contains only simulated data. There is no clear workflow that brings data from the raw/processed data to that sheet?
+
+```{r}
+#The forest plot below is only for d3 (rebound effect), as requested by Editor.
+library(readxl)
+library(forestplot)
+
+data <- read_excel("../../data/processed/RRR_Hyperaccesibility.xlsx", sheet = "forestplotd3") #note new sheet name
+View(data)
+
+## The rest of the columns in the table. 
+tabletext <- cbind(c("Lab (Country)","\n",data$Lab), 
+                   c("N","\n",data$N)) #\n means new line
+
+forestplot(labeltext=tabletext, graph.pos=3, 
+           mean=c(NA,NA,data$Point), 
+           lower=c(NA,NA,data$Low), upper=c(NA,NA,data$High),
+           zero=0, cex=0.9, lineheight = unit(5, "mm"), boxsize=0.5, colgap=unit(6,"mm"),
+           lwd.ci=2, ci.vertices=TRUE, ci.vertices.height = 0.4)
+
+#Updated: Oct 2022 (as requested by Editor)
+#Editor requested a meta-analysis of the three-way interaction between Condition, Time Pressure, and Word Type.
+
+#3-way interaction (Condition x Time Pressure x Word Type)
+#library(meta) 
+#summary(intWE92) <- metagen(TE= threeway.beta.int_term, seTE = threeway.SE.int_term, data = RRR_metaWE92)
+# summary(intWegner87) <- metagen(TE= threeway.beta.int_term, seTE = threeway.SE.int_term, data = RRR_metaWegner87)
+# Ian: no RRR_metaWegner87 exists?
+
+```
+
+some of the code in the previous chunk is commented out as RRR_metaWegner87 object does not exist.
+
+meta analysis code runs but using simulated data from RRR_Hyperaccesibility.xlsx
+
+# For analysis of any single lab, import only one datafile at any one time.
+
+```{r}
+
+# RRR_WE92 <- read_excel("Arbula_ISSA_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Astle_TAM_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Baldwin_GSU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Barbu_AICU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Brady_WFU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Calvillo_CSU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Chan_NTU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Chen_PKU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Dewitte_KUL_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Fiedler_Bamberg_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Hawk_Digipen_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Heiman_IU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Hussey_Bern_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Kim_WU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Ku_SYSU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Kumalasari_UPI_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Labarta_UCSD_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Légal_UPN_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Liem_Maret _Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Lin_USTC_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Linden_CSU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Lopez_WPI_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Ma-Kellams_SJSU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Majeed_UCMerced_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Mammarella_UP_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Moskowitz_LU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Ngyuen_UCSF_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Prada_Lisbon_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Quek_NUS_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Saraiva_ISPA_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Torka_TUD_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Wang_HHU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Wilkowski_Wyoming_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Wong_UNott_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Xu_SISU_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+# RRR_WE92 <- read_excel("Yusainy_Brawijaya_Study1_cleaned.xlsx", sheet = "testdata", na = "NA")
+
+```
+
+# Other issues
+
+## All rounding in the code is done via round() which does not round the way people think
+
+`round(3.5)`  = 4, but `round(4.5)` also = 4. 
+
+all round() should be changed to janitor::round_half_up().
+
+## Double rounding
+
+In study 1, df1 is rounded, then summarized across sites, then rounded again for reporting. Double rounding should be avoided as it distorts estimates.
+

@@ -35,7 +35,7 @@ options(scipen = 999)
 
 # Summary and critique of multilevel models
 
-"Because the design has two within-subject factors (word type: target vs. nontarget words; time pressure: high vs. low), within a regression, this must be modeled as a MLM." - this isn't the case? But the fact that the data is being collected at multiple sites with the acknowledged potential for differences in scoring strategies between them is a reason to include site in the model. This would also align the multilevel models with the meta-analysis models (recognising that meta-analyses are a type of constrained multilevel model).
+"Because the design has two within-subject factors (word type: target vs. nontarget words; time pressure: high vs. low), within a regression, this must be modeled as a MLM." - this isn't the case? But the fact that the data is being collected at multiple sites with the acknowledged potential for differences in scoring strategies between them is a reason to include site in the model. This would also align the multilevel models with the meta-analysis models (recognizing that meta-analyses are a type of constrained multilevel model).
 
 ## Study 1
 
